@@ -1,0 +1,4 @@
+FROM redis/redis-stack-server:latest
+
+
+COPY ./modules/redisearch-arm.so /opt/redis-stack/etc/redisearch.so

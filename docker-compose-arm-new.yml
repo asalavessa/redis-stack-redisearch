@@ -1,0 +1,123 @@
+services: 
+  redisinsight:
+    image: redislabs/redisinsight:2.50.0-arm64
+    ports: 
+      - 8001:5540 
+    volumes: 
+      - redis_data:/data:rw
+    network_mode: "bridge"
+
+
+  cluster_initiator: 
+      image: redis/redis-stack-server:7.4.0-v0-arm64
+      ports: 
+        - 8000:8000
+      command: ["redis-cli", "--cluster", "create", "10.0.0.15:7000", "10.0.0.15:7001", "10.0.0.15:7002", "10.0.0.15:7003", "10.0.0.15:7004", "10.0.0.15:7005", "--cluster-replicas", "1", "--cluster-yes"]
+      depends_on: 
+        - redis-node-1
+        - redis-node-2
+        - redis-node-3
+        - redis-node-4
+        - redis-node-5
+        - redis-node-6
+      network_mode: "host"
+
+
+  redis-node-1: 
+    image: redis/redis-stack-server:7.4.0-v0-arm64
+    container_name: redis-node-1 
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--loadmodule /opt/redis-stack/etc/redisearch.so", "--loadmodule /opt/redis-stack/lib/rejson.so"] 
+    ports: 
+      - 7000:7000
+    volumes: 
+      - redis_data_7000:/data:rw
+      - ./configs/node1/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./modules/redisearch.so:/opt/redis-stack/etc/redisearch.so
+    environment: 
+      - REDIS_ARGS = "--save 10 1 --appendonly yes" 
+    network_mode: "host"
+
+
+  redis-node-2: 
+    image: redis/redis-stack-server:7.4.0-v0-arm64
+    container_name: redis-node-2 
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--loadmodule /opt/redis-stack/lib/redisearch.so", "--loadmodule /opt/redis-stack/lib/rejson.so" ] 
+    ports: 
+      - 7001:7001
+    volumes: 
+      - redis_data_7001:/data:rw
+      - ./configs/node2/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./modules/redisearch.so:/opt/redis-stack/lib-custom/redisearch.so
+    environment: 
+      - REDIS_ARGS = "--save 10 1 --appendonly yes" 
+    network_mode: "host"
+
+
+  redis-node-3: 
+    image: redis/redis-stack-server:7.4.0-v0-arm64 
+    container_name: redis-node-3 
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--loadmodule /opt/redis-stack/lib/redisearch.so", "--loadmodule /opt/redis-stack/lib/rejson.so" ] 
+    ports: 
+      - 7002:7002
+    volumes: 
+      - redis_data_7002:/data:rw
+      - ./configs/node3/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./modules/redisearch.so:/opt/redis-stack/lib-custom/redisearch.so
+    environment: 
+    - REDIS_ARGS = "--save 10 1 --appendonly yes" 
+    network_mode: "host"
+
+
+  redis-node-4: 
+    image: redis/redis-stack-server:7.4.0-v0-arm64 
+    container_name: redis-node-4 
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--loadmodule /opt/redis-stack/lib/redisearch.so", "--loadmodule /opt/redis-stack/lib/rejson.so" ] 
+    ports: 
+      - 7003:7003
+    volumes: 
+      - redis_data_7003:/data:rw
+      - ./configs/node4/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./modules/redisearch.so:/opt/redis-stack/lib-custom/redisearch.so
+    environment: 
+    - REDIS_ARGS = "--save 10 1 --appendonly yes" 
+    network_mode: "host"
+
+
+  redis-node-5: 
+    image: redis/redis-stack-server:7.4.0-v0-arm64 
+    container_name: redis-node-5 
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--loadmodule /opt/redis-stack/lib/redisearch.so", "--loadmodule /opt/redis-stack/lib/rejson.so" ] 
+    ports: 
+      - 7004:7004
+    volumes: 
+      - redis_data_7004:/data:rw
+      - ./configs/node5/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./modules/redisearch.so:/opt/redis-stack/lib-custom/redisearch.so
+    environment: 
+    - REDIS_ARGS = "--save 10 1 --appendonly yes" 
+    network_mode: "host"
+
+
+  redis-node-6: 
+    image: redis/redis-stack-server:7.4.0-v0-arm64 
+    container_name: redis-node-6 
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--loadmodule /opt/redis-stack/lib/redisearch.so", "--loadmodule /opt/redis-stack/lib/rejson.so" ] 
+    ports: 
+      - 7005:7005
+    volumes: 
+      - redis_data_7005:/data:rw
+      - ./configs/node6/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./modules/redisearch.so:/opt/redis-stack/lib-custom/redisearch.so 
+    environment: 
+    - REDIS_ARGS = "--save 10 1 --appendonly yes" 
+    network_mode: "host"
+
+
+volumes:
+  redis_data:
+  redis_data_7000:
+  redis_data_7001:
+  redis_data_7002:
+  redis_data_7003:
+  redis_data_7004:
+  redis_data_7005:
